@@ -1,0 +1,8 @@
+# virtualenv
+psi
+
+# vim leftovers
+*.swp
+
+# python
+*.pyc

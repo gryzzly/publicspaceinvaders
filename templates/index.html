@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <style>
+  body {
+    font-family:helvetica;
+  }
+  * {
+    margin:0;
+    padding:0;
+  }
+  body {
+    margin:20px;
+    color:#444;
+  }
+  body > div {
+    margin:0 0 40px;
+    position:relative;
+    padding:0 0 20px;
+    width:896px;
+  }
+  h1 {
+    text-transform:capitalize;
+    letter-spacing:-1px;
+    font-size:1.2em;
+    color:#000;
+    position:absolute;
+    bottom:20px;
+    right:0;
+  }
+  ul {
+    list-style:none;
+    width:900px;
+    padding:5px;
+    overflow:hidden;
+  }
+  li {
+    font-size:14px;
+    float:left;
+    width:70px;
+    height:70px;
+    padding:5px;
+    background:#000;
+    margin:0 10px 10px 0;
+  	cursor: pointer;
+    color:#888;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+  }
+  .active {
+    color:#fff;
+    font-weight:bold;
+    background:#333;
+    box-shadow:0 0 20px yellow,0 0 20px yellow;
+  }
+  </style>
+  <script>psiData = {{ data|safe }};</script>
+</head>
+<body>
+<script src="/media/js/jquery-1.7.1.js"></script>
+<script src="/media/js/underscore.js"></script>
+<script src="/media/js/backbone.js"></script>
+<script src="/media/js/backbone.localStorage.js"></script>
+<script type="template/html" id="generic-item-template">
+ <%= data.name %>
+</script>
+<script type="template/html" id="containers-template">
+  <div>
+    <h1><%= name %>s</h1>
+    <ul class="<%= name %>"></ul>
+  </div>
+</script>
+<script>
+!function ( global, doc, undefined ) {
+
+      // model
+  var Node = Backbone.Model.extend({
+        initialize : function () {
+          this.cid = this.get('id');
+        }
+      }),
+      // collection
+      nodes = new (Backbone.Collection.extend({
+        model : Node
+      })),
+      nodeTypes = {};
+
+  // push items to the collection
+  // - cache adjacent nodes‘ ids for fast retrieval 
+  // - cache types of nodes
+  _.each( psiData.nodes, function ( node ) {
+    var id = node.id,
+        adjacentIds = [];
+
+    // cache type
+    if (!nodeTypes[ node.type ]) nodeTypes[ node.type ] = true;
+
+    _.each( psiData.edges, function ( edge ) {
+      var index = _.indexOf( edge, id );
+      if ( index !== -1) adjacentIds.push( edge[+!index] );
+    });
+
+    node.adjacentIds = adjacentIds;
+    nodes.add( node );
+  });
+
+  var NodeView = Backbone.View.extend({
+    tagName : 'li'
+  , template : _.template( $('#generic-item-template').html() )
+  , render : function () {
+      this.$el
+        .html( this.template( this.model.toJSON() ) );
+      return this;
+    }
+  , initialize : function () {
+      this.$el = $(this.el);
+      _.bindAll(this);
+      this.model.bind('change:active', this.togglePresentation);
+    }
+  , events : {
+      "click" : "toggleAdjacent"
+    }
+  , toggleAdjacent : function () {
+      var ids = this.model.get('adjacentIds'),
+          state = this.model.get('active');
+
+      nodes.each(function ( node ) {
+      	node.set( { active : false } );
+        if (_.indexOf( ids, node.cid ) === -1) return;
+        node.set( { active : !state } );
+      });
+
+      this.model.set( { active : !state } );
+    }
+  , togglePresentation : function () {
+  		this.$el.removeClass('active');
+  	  	if (this.model.get('active')) this.$el.addClass('active');
+    }
+  , selectAdjacent : function () {
+    
+    }
+  });
+
+  // Create containers for each type of the objects
+  !function (nodeTypes) {
+    var body = $('body'),
+        template = _.template(  $('#containers-template').html() );
+
+    _.each( nodeTypes, function( value, type ){
+      body.append( template( { name :  type } ));
+    });
+  }(nodeTypes); 
+
+  // Render each node 
+  var nodesView = new (Backbone.View.extend({
+    addOne : function ( node ) {
+      $('.' + node.get('type') )
+        .append(
+          new NodeView({ model : node }).render().el
+        );
+    },
+    addAll : function () {
+      nodes.each( this.addOne );
+    },
+    initialize : function () {
+      this.addOne = _.bind(this.addOne, this);
+      this.addAll();
+    }
+  })); 
+
+
+}( window, document )
+</script>
+</body>
+</html>
