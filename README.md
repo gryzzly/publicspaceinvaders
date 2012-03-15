@@ -11,26 +11,29 @@
         >>> # press ctrl + d to exit from REPL
         
     If you don't have python installed at all on your system, consult google on installing python on your system
+    
+2. You also need some database system running on your system. Default is mysql. Consult google on installing it. 
+However, you can also use sqlite. To do that, change settings in `settings/settings.local` accordingly.
         
-2. Install http://pypi.python.org/pypi/virtualenv
+3. Install http://pypi.python.org/pypi/virtualenv
 
         pip install virtualenv
 
-3. Clone the repository from github into `psi` folder. That folder needs to be empty or to not exist in order to clone into it. Change into that folder then.
+4. Clone the repository from github into `psi` folder. That folder needs to be empty or to not exist in order to clone into it. Change into that folder then.
 
         git clone git@github.com:gryzzly/publicspaceinvaders.git psi && cd psi
 
-4. Create independent virtual environment
+5. Create independent virtual environment
 
         virtualenv --no-site-packages psi
 
     This will create a folder `psi` in current folder. All environment we use to run application locally is stored in this folder.
 
-5. Activate this virtual environment
+6. Activate this virtual environment
 
         source psi/bin/activate
 
-6. Install the dependencies
+7. Install the dependencies
 
         pip install -r requirements.txt
     
@@ -40,11 +43,12 @@
 
     The list you will see should match what you will find in `requirments.txt` file
 
-7. Remove the leftover `build` directory from the root of the application
+8. Remove the leftover `build` directory from the root of the application
 
         rm -rf build
 
-8. Create a database and a user matching local settings of the repository
+9. Create a database and a user matching local settings of the repository (running
+this command will delete existing `publicspaceinvaders_db` database, if you have one!)
 
         mysql -u root < setupdb.sql
 
@@ -52,9 +56,15 @@
 
         mysql -u root -p < setupdb.sql
 
-9. Sync database to create appropriate tables and admin user. Remember the password :-)
+10. Sync database to create appropriate tables and admin user. Remember the password :-)
 
-        python manage.py syncdb --settings.settings.local
+        python manage.py syncdb --settings=settings.local
+        
+11. Start the development server
+
+        python manage.py runserver --settings=settings.local
+        
+12. Hack hack hack
 
 
 
