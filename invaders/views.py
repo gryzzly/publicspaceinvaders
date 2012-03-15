@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response
 from django.utils import simplejson
 #from django.core import serializers
-from publicspaceinvaders.invaders.models import Nodes, Edges
+from psi.invaders.models import Nodes, Edges
 
 def data(request):
     nodes = []

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from publicspaceinvaders.invaders.models import Nodes, Edges
+from psi.invaders.models import Nodes, Edges
 
 #def set_node_as_person(modeladmin, request, queryset):
 #    queryset.update(type=1)
@@ -9,10 +9,14 @@ from publicspaceinvaders.invaders.models import Nodes, Edges
 class NodesAdmin(admin.ModelAdmin):
     list_display = ('type', 'icon', 'name', 'description')
     search_fields = ('type', 'name', 'description')
+
 #    actions = [set_node_as_person]
 
 class EdgesAdmin(admin.ModelAdmin):
     list_display = ('src', 'dest', 'edge_types', '__unicode__')
+    
+    class Meta:
+        verbose_name_plural = "Edges"
     
 
 admin.site.register(Nodes, NodesAdmin)

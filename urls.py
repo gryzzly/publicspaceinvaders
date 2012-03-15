@@ -9,8 +9,6 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'psi.invaders.views.data', name='data'),
-    # url(r'^json/$', 'publicspaceinvaders.invaders.views.data', name='data'),
-    # url(r'^spaceinvaders/', include('spaceinvaders.foo.urls')),
 
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
       'document_root':  os.path.join(os.path.dirname(os.path.realpath(__file__)), 'media')

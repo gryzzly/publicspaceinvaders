@@ -11,6 +11,9 @@ class Nodes(models.Model):
     icon = models.ImageField(upload_to='psi_alpha_icons', blank = True)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=100, blank = True)
+      
+    class Meta:
+        verbose_name_plural = "Nodes"
 
     def __unicode__(self):
       return self.name
@@ -24,4 +27,6 @@ class Edges(models.Model):
   
     def __unicode__(self):
       return '%s - %s' % (self.src.name, self.dest.name)
-
+      
+    class Meta:
+        verbose_name_plural = "Edges"
