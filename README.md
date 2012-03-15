@@ -47,7 +47,8 @@ However, you can also use sqlite. To do that, change settings in `settings/setti
 
         rm -rf build
 
-9. Create a database and a user matching local settings of the repository
+9. Create a database and a user matching local settings of the repository (running
+this command will delete existing `publicspaceinvaders_db` database, if you have one!)
 
         mysql -u root < setupdb.sql
 
@@ -57,7 +58,13 @@ However, you can also use sqlite. To do that, change settings in `settings/setti
 
 10. Sync database to create appropriate tables and admin user. Remember the password :-)
 
-        python manage.py syncdb --settings.settings.local
+        python manage.py syncdb --settings=settings.local
+        
+11. Start the development server
+
+        python manage.py runserver --settings=settings.local
+        
+12. Hack hack hack
 
 
 
