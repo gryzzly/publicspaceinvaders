@@ -39,5 +39,7 @@ TEMPLATE_DIRS = (
     os.path.join(SITE_ROOT, 'templates')
 )
 
+ROOT_URLCONF = 'psi.urls'
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
