@@ -16,7 +16,7 @@
     color:#444;
   }
   body > div {
-    margin:0 0 40px;
+    margin:40px 0 40px;
     position:relative;
     padding:0 0 20px;
     width:896px;
@@ -27,14 +27,18 @@
     font-size:1.2em;
     color:#000;
     position:absolute;
-    bottom:20px;
+    top:-24px;
     right:0;
+    background-color:#eee;
+    padding:4px;
+    z-index:-10;
   }
   ul {
     list-style:none;
     width:900px;
     padding:5px;
     overflow:hidden;
+    background: #eee;
   }
   li {
     font-size:14px;
@@ -51,12 +55,37 @@
     -ms-user-select: none;
     -o-user-select: none;
     user-select: none;
+    border:5px solid transparent;
   }
   .active {
     color:#fff;
     font-weight:bold;
     background:#333;
-    box-shadow:0 0 20px yellow,0 0 20px yellow;
+  }
+  .head.orange {
+    background:#ff8b40;
+  }
+  .head.red {
+    background:#fe3f44;
+  }
+  .head.green {
+    background:#42e73a;
+  }
+  .head.blue {
+    background:#34d1b2;
+  }
+  /* TODO: show that node simultaneusly belongs to more than one selection */
+  .orange {
+    border-top-color: #ff6400;
+  }
+  .red {
+    border-right-color: #FD0006;
+  }
+  .green {
+    border-bottom-color: #0ACF00;
+  } 
+  .blue {
+    border-left-color: #00A383;
   }
   </style>
   <script>psiData = {{ data|safe }};</script>
@@ -117,6 +146,7 @@
         .html( this.template( this.model.toJSON() ) );
       return this;
     }
+    // TODO: toggle view from nodesView, not from single node view
   , initialize : function () {
       this.$el = $(this.el);
       _.bindAll(this);
@@ -125,24 +155,56 @@
   , events : {
       "click" : "toggleAdjacent"
     }
+    // When selecting a node we highlight the related nodes.
+    // When there exists previous selection and user clicks
+    // on one of the already selected nodes, we start a new selection
+    // visually highlighted in different color. 
+    // Clicking on not yet selected node turns off the previous selections.
   , toggleAdjacent : function () {
       var ids = this.model.get('adjacentIds'),
           state = this.model.get('active');
 
+      if (this.model.get('head')) return;
+  
+      if (!this.model.get('active')) {
+        this.deselectAll();
+        nodesView.selections = 0;
+      }
       nodes.each(function ( node ) {
-      	node.set( { active : false } );
+        // turn off all prev. selected nodes
+      	// node.set( { active : false } );
         if (_.indexOf( ids, node.cid ) === -1) return;
-        node.set( { active : !state } );
-      });
+        node.set({ 
+          active : true 
+        });
+        node.trigger('change:active');
+      }, this);
 
-      this.model.set( { active : !state } );
+      this.model.set({ 
+        active : true,
+        // a node that started selection
+        head : true
+      });
+      this.model.trigger('change:active');
+
+      if (nodesView.selections++ === 4) {
+        this.deselectAll();
+        nodesView.selections = 0;
+      }
+      
+    }
+  , deselectAll : function () {
+      nodes.each(function ( node ) {
+        node.set({ active: false });
+      });
     }
   , togglePresentation : function () {
-  		this.$el.removeClass('active');
-  	  	if (this.model.get('active')) this.$el.addClass('active');
-    }
-  , selectAdjacent : function () {
-    
+  	  if (this.model.get('active')) {
+        if (this.model.get('head')) this.$el.addClass('head');
+        this.$el.addClass('active ' + nodesView._colors[nodesView.selections])
+      } else {
+        this.$el.removeClass();
+      }
     }
   });
 
@@ -157,7 +219,7 @@
   }(nodeTypes); 
 
   // Render each node 
-  var nodesView = new (Backbone.View.extend({
+  var nodesView = window.nodesView = new (Backbone.View.extend({
     addOne : function ( node ) {
       $('.' + node.get('type') )
         .append(
@@ -168,6 +230,8 @@
       nodes.each( this.addOne );
     },
     initialize : function () {
+      this._colors = ["orange", "red", "green", "blue"];
+      this.selections = 0;
       this.addOne = _.bind(this.addOne, this);
       this.addAll();
     }
