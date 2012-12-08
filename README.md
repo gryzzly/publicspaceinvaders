@@ -22,6 +22,10 @@ However, you can also use sqlite. To do that, change settings in `settings/setti
 4. Clone the repository from github into `psi` folder. That folder needs to be empty or to not exist in order to clone into it. Change into that folder then.
 
         git clone git@github.com:gryzzly/publicspaceinvaders.git psi && cd psi
+        
+    alternatively:    
+        
+        git clone git://github.com/gryzzly/publicspaceinvaders.git psi
 
 5. Create independent virtual environment
 
